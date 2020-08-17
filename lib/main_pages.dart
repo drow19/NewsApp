@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutternews/country_pages.dart';
 import 'package:flutternews/detail_news.dart';
 import 'package:flutternews/helper/data.dart';
 import 'package:flutternews/model/category_model.dart';
@@ -8,84 +9,30 @@ import 'package:flutternews/repository/news_repository.dart';
 
 class MainPages extends StatefulWidget {
   final String category;
+  final String country;
+  final String countryName;
+  final String countryFlag;
 
-  MainPages({this.category});
+  MainPages({this.category, this.country, this.countryName, this.countryFlag});
 
   @override
   _MainPagesState createState() => _MainPagesState();
 }
 
 class _MainPagesState extends State<MainPages> {
-  /* var _country = [
-    {"id": "ae", "country_name": "UAE"},
-    {"id": "ar", "country_name": "Argentina"},
-    {"id": "at", "country_name": "Austria"},
-    {"id": "au", "country_name": "Australia"},
-    {"id": "be", "country_name": "Belgium"},
-    {"id": "bg", "country_name": "Bulgaria"},
-    {"id": "br", "country_name": "Brazil"},
-    {"id": "ca", "country_name": "Canada"},
-    {"id": "ch", "country_name": "Switzerland"},
-    {"id": "cn", "country_name": "China"},
-    {"id": "co", "country_name": "Colombia"},
-    {"id": "cu", "country_name": "Cuba"},
-    {"id": "cz", "country_name": "Czech Republic"},
-    {"id": "de", "country_name": "Germany"},
-    {"id": "eg", "country_name": "Egypt"},
-    {"id": "fr", "country_name": "France"},
-    {"id": "gb", "country_name": "United Kingdom"},
-    {"id": "gr", "country_name": "Greece"},
-    {"id": "hk", "country_name": "Hong Kong"},
-    {"id": "hu", "country_name": "Hungary"},
-    {"id": "id", "country_name": "Indonesia"},
-    {"id": "ie", "country_name": "Ireland"},
-    {"id": "il", "country_name": "Israel"},
-    {"id": "in", "country_name": "India"},
-    {"id": "it", "country_name": "Italy"},
-    {"id": "jp", "country_name": "Japan"},
-    {"id": "kr", "country_name": "South Korea"},
-    {"id": "lt", "country_name": "Lihuania"},
-    {"id": "lv", "country_name": "Latvia"},
-    {"id": "ma", "country_name": "Morocco"},
-    {"id": "mx", "country_name": "Mexico"},
-    {"id": "my", "country_name": "Malaysia"},
-    {"id": "ng", "country_name": "Nigeria"},
-    {"id": "nl", "country_name": "Netherlands"},
-    {"id": "no", "country_name": "Norway"},
-    {"id": "nz", "country_name": "New Zealand"},
-    {"id": "ph", "country_name": "Philippines"},
-    {"id": "pl", "country_name": "Poland"},
-    {"id": "pt", "country_name": "Portugal"},
-    {"id": "ro", "country_name": "Romania"},
-    {"id": "rs", "country_name": "Serbia"},
-    {"id": "ru", "country_name": "Russia"},
-    {"id": "sa", "country_name": "Saudi Arabia"},
-    {"id": "se", "country_name": "Sweden"},
-    {"id": "sg", "country_name": "Singapore"},
-    {"id": "si", "country_name": "Slovenia"},
-    {"id": "sk", "country_name": "Slovakia"},
-    {"id": "th", "country_name": "Thailand"},
-    {"id": "tr", "country_name": "Turkey"},
-    {"id": "tw", "country_name": "Taiwan"},
-    {"id": "ua", "country_name": "Ukraine"},
-    {"id": "us", "country_name": "United States"},
-    {"id": "ve", "country_name": "Venezuela"},
-    {"id": "za", "country_name": "South Africa"},
-  ];*/
-
-  List<CategoryModel> category = new List<CategoryModel>();
+  List<CategoryModel> _category = new List<CategoryModel>();
   List<NewsModel> _news = new List<NewsModel>();
 
   Future<String> getNews() async {
     print(widget.category);
-    _news = await NewsRepository().getData(widget.category);
+    _news = await NewsRepository().getData(widget.category, widget.country);
   }
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-    category = getCategory();
+    _category = getCategory();
   }
 
   @override
@@ -109,6 +56,40 @@ class _MainPagesState extends State<MainPages> {
             ),
           ],
         ),
+        actions: [
+          GestureDetector(
+              onTap: () {
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (context) => CountryPages()));
+              },
+              child: Stack(
+                children: [
+                  Container(
+                    margin: new EdgeInsets.fromLTRB(0, 12, 12, 12),
+                    height: 30,
+                    width: 30,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      image: new DecorationImage(
+                          image: NetworkImage(widget.countryFlag ??
+                              "https://www.worldometers.info/img/flags/small/tn_id-flag.gif"),
+                          fit: BoxFit.cover),
+                    ),
+                  ),
+                  Center(
+                    child: Container(
+                      alignment: Alignment.center,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: Colors.black12,
+                      ),
+                      width: 30,
+                      height: 30,
+                    ),
+                  ),
+                ],
+              ))
+        ],
       ),
       body: Container(
         child: Column(
@@ -118,13 +99,14 @@ class _MainPagesState extends State<MainPages> {
               margin: EdgeInsets.only(bottom: 6),
               height: 80,
               child: ListView.builder(
-                  itemCount: category.length,
+                  itemCount: _category.length,
                   shrinkWrap: true,
                   scrollDirection: Axis.horizontal,
                   itemBuilder: (context, index) {
                     return CategoryTile(
-                      categoryName: category[index].categoryName,
-                      image: category[index].image,
+                      categoryName: _category[index].categoryName,
+                      image: _category[index].image,
+                      country: widget.country,
                     );
                   }),
             ),
@@ -143,18 +125,20 @@ class _MainPagesState extends State<MainPages> {
             if (snapshot.hasError) {
               return Center(
                 child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
                       "Error",
                       style: TextStyle(
-                          fontSize: 16,
+                          fontSize: 18,
                           color: Color(0xffdf678c),
                           fontFamily: 'Spectral'),
                     ),
+                    Text(" "),
                     Text(
                       "Connection",
                       style: TextStyle(
-                          fontSize: 16,
+                          fontSize: 18,
                           color: Color(0xff3d155f),
                           fontFamily: 'Spectral'),
                     ),
@@ -239,8 +223,9 @@ class _MainPagesState extends State<MainPages> {
 class CategoryTile extends StatelessWidget {
   final String categoryName;
   final image;
+  final String country;
 
-  CategoryTile({this.categoryName, this.image});
+  CategoryTile({this.categoryName, this.image, this.country});
 
   @override
   Widget build(BuildContext context) {
@@ -251,6 +236,7 @@ class CategoryTile extends StatelessWidget {
             MaterialPageRoute(
                 builder: (context) => MainPages(
                       category: categoryName.toLowerCase(),
+                      country: country,
                     )));
       },
       child: Container(
