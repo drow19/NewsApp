@@ -6,8 +6,4 @@ Flutter news application
 source : https://newsapi.org/
 
 ## Screenshot 
-![](images/home.jpg)
-
-![](images/detail.jpg)
-
-![](images/country.jpg)
+![](images/home.jpg)  ![](images/detail.jpg) ![](images/country.jpg)
