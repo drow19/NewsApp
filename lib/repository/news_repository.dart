@@ -11,9 +11,9 @@ class NewsRepository {
     print(country);
 
     if(category == null){
-      _url = "https://newsapi.org/v2/top-headlines?country=$country&apiKey=fcb76749a2d44655a29e1e5741da827e";
+      _url = "https://newsapi.org/v2/top-headlines?country=$country&apiKey=<YOUR_APIKEY>";
     }else{
-      _url = "https://newsapi.org/v2/top-headlines?country=$country&category=$category&apiKey=fcb76749a2d44655a29e1e5741da827e";
+      _url = "https://newsapi.org/v2/top-headlines?country=$country&category=$category&apiKey=<YOUR_APIKEY>";
     }
 
     print(_url);
